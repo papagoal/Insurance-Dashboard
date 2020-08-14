@@ -1,0 +1,26 @@
+version: '3.6'
+services:
+  postgres:
+    #image: postgres
+    image: mdillon/postgis
+    #restart: always
+    env_file:
+    - database.env
+    volumes:
+    - db_data:/var/lib/postgresql/data
+  graphql-engine:
+    image: hasura/graphql-engine:v1.0.0
+    restart: always
+    ports:
+    - 8080:8080
+    depends_on:
+    - postgres
+    environment:
+      HASURA_GRAPHQL_DATABASE_URL: postgres://airm:airm@postgres:5432/airm_db
+      HASURA_GRAPHQL_ENABLE_CONSOLE: "true" # set to "false" to disable console
+      HASURA_GRAPHQL_ENABLED_LOG_TYPES: startup, http-log, webhook-log, websocket-log, query-log
+      HASURA_GRAPHQL_ADMIN_SECRET: airmsecret
+      HASURA_GRAPHQL_JWT_SECRET: "${JWT_SECRET}"
+      ## uncomment next line to set an admin secret
+volumes:
+  db_data:
